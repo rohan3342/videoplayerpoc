@@ -20,7 +20,14 @@ const Grid = ({ ...props }) => {
         data={listData}
         bounces={false}
         bouncesZoom={false}
+        initialScrollIndex={0}
         pagingEnabled={true}
+        onMomentumScrollBegin={({ nativeEvent }) => {
+          console.log('onMomentumScrollBegin', nativeEvent);
+        }}
+        onScroll={({ nativeEvent }) => {
+          // console.log('onScroll', nativeEvent);
+        }}
         renderItem={({ item, index }) => (
           <GridLayout list={item} index={index} />
         )}

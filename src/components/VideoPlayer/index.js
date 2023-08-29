@@ -30,7 +30,7 @@ const VideoPlayer = ({ playUrl, ...props }) => {
     <Video
       onEnd={onEnd}
       repeat={true}
-      muted={false}
+      muted={true}
       onLoad={onLoad}
       resizeMode='cover'
       disableFocus={true}
