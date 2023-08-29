@@ -29,10 +29,10 @@ const App = () => {
   return (
     <View style={styles.container}>
       <FloatingButton defaultView={defaultView} onViewChange={onViewChange} />
-      <View style={styles.mainContainer}>
-        <ShowView />
-      </View>
-      <VideoPlayerContainer />
+      {/* <View style={styles.mainContainer}> */}
+      <ShowView />
+      {/* </View> */}
+      <VideoPlayerContainer defaultView={defaultView} />
     </View>
   );
 };

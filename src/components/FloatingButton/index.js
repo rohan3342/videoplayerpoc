@@ -30,7 +30,7 @@ export default index;
 
 const styles = StyleSheet.create({
   container: {
-    zIndex: 2,
+    zIndex: 3,
     bottom: 0,
     height: 70,
     padding: 12,

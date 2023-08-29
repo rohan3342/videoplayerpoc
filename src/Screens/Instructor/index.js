@@ -19,11 +19,9 @@ const Instructor = () => {
 
   return (
     <View style={styles.container}>
-      <UserCard
-        name={videoPlayer}
-        itemWidth={'100%'}
-        itemHeight={'100%'}
+      <View
         key={`${0}_${videoPlayer}`}
+        style={styles.videoPlayerView}
         onLayout={({ nativeEvent }) => {
           DeviceEventEmitter.emit('videoPlayerStyle', nativeEvent.layout);
         }}
@@ -44,17 +42,21 @@ export default Instructor;
 
 const styles = StyleSheet.create({
   container: {
-    padding: 4,
+    zIndex: 2,
     width: '100%',
     height: '100%',
     alignItems: 'center',
+    position: 'absolute',
     justifyContent: 'center',
   },
-  videoPlayerView: {},
+  videoPlayerView: {
+    width: '100%',
+    height: '100%',
+  },
   localUserView: {
     top: 16,
     right: 16,
-    zIndex: 3,
+    zIndex: 2,
     borderRadius: 5,
     shadowRadius: 10,
     shadowOpacity: 0.2,
