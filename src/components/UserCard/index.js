@@ -5,6 +5,7 @@ import VideoPlayer from '../VideoPlayer';
 
 const UserCard = ({
   name,
+  index,
   itemWidth,
   showPlayer,
   itemHeight,
@@ -12,6 +13,7 @@ const UserCard = ({
   onLayout = () => {},
   ...props
 }) => {
+  console.log('showPlayer', showPlayer, index);
   return (
     <View
       onLayout={onLayout}

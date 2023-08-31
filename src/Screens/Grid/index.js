@@ -1,4 +1,5 @@
 import {
+  View,
   FlatList,
   Dimensions,
   StyleSheet,
@@ -10,7 +11,12 @@ import React, { Fragment, memo, useEffect, useMemo, useState } from 'react';
 import Pinned from '../Pinned';
 import Instructor from '../Instructor';
 import UserCard from '../../components/UserCard';
-import { UserData, LayoutType, splitArrayIntoChunks } from '../../utils';
+import {
+  UserData,
+  LayoutType,
+  splitArrayForGrid,
+  splitArrayIntoChunks,
+} from '../../utils';
 
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
@@ -31,13 +37,13 @@ const Grid = ({ ...props }) => {
       <PagerView
         initialPage={0}
         style={styles.scrollView}
-        scrollEnabled={
-          defaultView !== LayoutType.PINNED &&
-          defaultView !== LayoutType.INSTRUCTOR
-        }
+        // scrollEnabled={
+        //   defaultView !== LayoutType.PINNED &&
+        //   defaultView !== LayoutType.INSTRUCTOR
+        // }
       >
         {listData.map((item, index) => (
-          <GridLayout key={index} list={item} rowIndex={index} />
+          <GridLayout key={index} list={item} index={index} />
         ))}
       </PagerView>
       {/* {listData.length > 0 && (
@@ -65,7 +71,14 @@ const Grid = ({ ...props }) => {
   );
 };
 
-const GridLayout = memo(({ list, rowIndex }) => {
+const GridLayout = memo(({ list, index }) => {
+  const splitListData = splitArrayForGrid(list, false);
+  const numRows = splitListData?.length;
+  const numColumns = Math.max(...splitListData.map((group) => group.length));
+  const columnWidth = 100 / numColumns + '%';
+  const rowHeight =
+    numColumns === 1 ? '100%' : numRows === 1 ? '50%' : 100 / numRows + '%';
+
   const [defaultView, setDefaultView] = useState('');
 
   useEffect(() => {
@@ -75,49 +88,127 @@ const GridLayout = memo(({ list, rowIndex }) => {
   }, []);
 
   return (
-    <FlatList
-      data={list}
-      numColumns={4}
-      bounces={false}
-      bouncesZoom={false}
-      style={styles.grid}
-      renderItem={({ item, index }) => {
-        console.log('index', index);
+    <View style={styles.grid}>
+      {splitListData.map((group, rowIndex) => {
         if (
           (defaultView === LayoutType.INSTRUCTOR ||
             defaultView === LayoutType.PINNED) &&
-          !(rowIndex === 0 && index === 0)
+          rowIndex !== 0 &&
+          index !== 0
         ) {
           return;
         }
         return (
-          <UserCard
-            name={item}
-            index={index}
-            showPlayer={rowIndex === 0 && index === 0}
-            containerStyle={{
-              height:
-                defaultView === LayoutType.INSTRUCTOR ||
-                defaultView === LayoutType.PINNED
-                  ? HEIGHT
-                  : HEIGHT * 0.32,
-              width:
-                defaultView === LayoutType.INSTRUCTOR
-                  ? WIDTH
-                  : defaultView === LayoutType.PINNED
-                  ? WIDTH * 0.75
-                  : (WIDTH - 16) * 0.25,
-            }}
-          />
+          <View
+            key={rowIndex}
+            style={[
+              styles.gridRow,
+              {
+                width:
+                  defaultView === LayoutType.INSTRUCTOR
+                    ? WIDTH
+                    : defaultView === LayoutType.PINNED
+                    ? WIDTH * 0.75
+                    : '100%',
+                height:
+                  defaultView === LayoutType.INSTRUCTOR ||
+                  defaultView === LayoutType.PINNED
+                    ? HEIGHT
+                    : rowHeight,
+              },
+            ]}
+          >
+            {group.map((_item, _index) => {
+              if (
+                (defaultView === LayoutType.INSTRUCTOR ||
+                  defaultView === LayoutType.PINNED) &&
+                rowIndex !== 0 &&
+                index !== 0 &&
+                _index !== 0
+              ) {
+                return;
+              }
+              return (
+                <UserCard
+                  name={_item}
+                  index={_index}
+                  key={`${_index}_${_item}`}
+                  showPlayer={index === 0 && rowIndex === 0 && _index === 0}
+                  containerStyle={{
+                    height:
+                      defaultView === LayoutType.INSTRUCTOR ||
+                      defaultView === LayoutType.PINNED
+                        ? HEIGHT
+                        : HEIGHT * 0.32,
+                    width:
+                      defaultView === LayoutType.INSTRUCTOR
+                        ? WIDTH
+                        : defaultView === LayoutType.PINNED
+                        ? WIDTH * 0.75
+                        : (WIDTH - 16) * 0.25,
+                  }}
+                />
+              );
+            })}
+          </View>
         );
-      }}
-      keyExtractor={(item, index) => `${item}_${index}`}
-      contentContainerStyle={{
-        alignItems: defaultView === LayoutType.GRID ? 'center' : 'flex-start',
-      }}
-    />
+      })}
+    </View>
   );
 });
+
+// const GridLayout = memo(({ list, rowIndex }) => {
+//   const [defaultView, setDefaultView] = useState('');
+
+//   useEffect(() => {
+//     DeviceEventEmitter.addListener('layoutTypeKey', (value) => {
+//       setDefaultView(value);
+//     });
+//   }, []);
+
+//   return (
+//     <FlatList
+//       data={list}
+//       numColumns={4}
+//       bounces={false}
+//       bouncesZoom={false}
+//       style={styles.grid}
+//       renderItem={({ item, index }) => {
+//         if (
+//           (defaultView === LayoutType.INSTRUCTOR ||
+//             defaultView === LayoutType.PINNED) &&
+//           !(rowIndex === 0 && index === 0)
+//         ) {
+//           return;
+//         }
+//         return (
+//           <UserCard
+//             name={item}
+//             index={index}
+//             showPlayer={rowIndex === 0 && index === 0}
+//             containerStyle={{
+//               height:
+//                 defaultView === LayoutType.INSTRUCTOR ||
+//                 defaultView === LayoutType.PINNED
+//                   ? HEIGHT
+//                   : HEIGHT * 0.32,
+//               width:
+//                 defaultView === LayoutType.INSTRUCTOR
+//                   ? WIDTH
+//                   : defaultView === LayoutType.PINNED
+//                   ? WIDTH * 0.75
+//                   : (WIDTH - 16) * 0.25,
+//             }}
+//           />
+//         );
+//       }}
+//       keyExtractor={(item, index) => `${item}_${index}`}
+//       contentContainerStyle={{
+//         alignItems: defaultView === LayoutType.GRID ? 'center' : 'flex-start',
+//       }}
+//     />
+//   );
+// });
 
 export default memo(Grid);
 
