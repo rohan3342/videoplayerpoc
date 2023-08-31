@@ -2,9 +2,9 @@ import {
   FlatList,
   Dimensions,
   StyleSheet,
+  ScrollView,
   DeviceEventEmitter,
 } from 'react-native';
-import PagerView from 'react-native-pager-view';
 import React, { Fragment, memo, useEffect, useMemo, useState } from 'react';
 
 import Pinned from '../Pinned';
@@ -28,8 +28,12 @@ const Grid = ({ ...props }) => {
 
   return (
     <Fragment>
-      <PagerView
-        initialPage={0}
+      <ScrollView
+        horizontal
+        bounces={false}
+        bouncesZoom={false}
+        pagingEnabled={true}
+        initialScrollIndex={0}
         style={styles.scrollView}
         scrollEnabled={
           defaultView !== LayoutType.PINNED &&
@@ -39,26 +43,7 @@ const Grid = ({ ...props }) => {
         {listData.map((item, index) => (
           <GridLayout key={index} list={item} rowIndex={index} />
         ))}
-      </PagerView>
-      {/* {listData.length > 0 && (
-        <FlatList
-          horizontal
-          data={listData}
-          bounces={false}
-          bouncesZoom={false}
-          pagingEnabled={true}
-          initialScrollIndex={0}
-          renderItem={renderItem}
-          decelerationRate={'fast'}
-          style={styles.scrollView}
-          showsHorizontalScrollIndicator={false}
-          scrollEnabled={
-            defaultView !== LayoutType.INSTRUCTOR &&
-            defaultView !== LayoutType.PINNED
-          }
-          contentContainerStyle={styles.scrollViewContentContainerStyle}
-        />
-      )} */}
+      </ScrollView>
       {defaultView === LayoutType.PINNED && <Pinned />}
       {defaultView === LayoutType.INSTRUCTOR && <Instructor />}
     </Fragment>
@@ -67,6 +52,19 @@ const Grid = ({ ...props }) => {
 
 const GridLayout = memo(({ list, rowIndex }) => {
   const [defaultView, setDefaultView] = useState('');
+  const instructorViewStyle = {
+    padding: 0,
+    width: WIDTH,
+    height: HEIGHT,
+  };
+
+  const pinnedViewStyle = {
+    padding: 0,
+    height: HEIGHT,
+    paddingLeft: 24,
+    paddingVertical: 24,
+    width: WIDTH * 0.75,
+  };
 
   useEffect(() => {
     DeviceEventEmitter.addListener('layoutTypeKey', (value) => {
@@ -82,7 +80,6 @@ const GridLayout = memo(({ list, rowIndex }) => {
       bouncesZoom={false}
       style={styles.grid}
       renderItem={({ item, index }) => {
-        console.log('index', index);
         if (
           (defaultView === LayoutType.INSTRUCTOR ||
             defaultView === LayoutType.PINNED) &&
@@ -90,24 +87,20 @@ const GridLayout = memo(({ list, rowIndex }) => {
         ) {
           return;
         }
+
         return (
           <UserCard
             name={item}
             index={index}
             showPlayer={rowIndex === 0 && index === 0}
-            containerStyle={{
-              height:
-                defaultView === LayoutType.INSTRUCTOR ||
-                defaultView === LayoutType.PINNED
-                  ? HEIGHT
-                  : HEIGHT * 0.32,
-              width:
-                defaultView === LayoutType.INSTRUCTOR
-                  ? WIDTH
-                  : defaultView === LayoutType.PINNED
-                  ? WIDTH * 0.75
-                  : (WIDTH - 16) * 0.25,
-            }}
+            containerStyle={[
+              {
+                height: HEIGHT * 0.32,
+                width: (WIDTH - 16) * 0.25,
+              },
+              defaultView === LayoutType.INSTRUCTOR && instructorViewStyle,
+              defaultView === LayoutType.PINNED && pinnedViewStyle,
+            ]}
           />
         );
       }}

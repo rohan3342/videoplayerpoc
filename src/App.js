@@ -10,7 +10,7 @@ const App = () => {
 
   useEffect(() => {
     setDefaultView(LayoutType.GRID);
-    DeviceEventEmitter.emit('layoutTypeKey', LayoutType.GRID);
+    DeviceEventEmitter.emit('layoutTypeKey', LayoutType.INSTRUCTOR);
   }, []);
 
   const onViewChange = (value) => {
