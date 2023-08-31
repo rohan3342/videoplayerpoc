@@ -1,15 +1,21 @@
-import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, DeviceEventEmitter } from 'react-native';
 
 import Grid from './Screens/Grid';
 import { LayoutType } from './utils';
 import FloatingButton from './components/FloatingButton';
 
 const App = () => {
-  const [defaultView, setDefaultView] = useState(LayoutType.GRID);
+  const [defaultView, setDefaultView] = useState('');
+
+  useEffect(() => {
+    setDefaultView(LayoutType.GRID);
+    DeviceEventEmitter.emit('layoutTypeKey', LayoutType.GRID);
+  }, []);
 
   const onViewChange = (value) => {
     setDefaultView(LayoutType[value]);
+    DeviceEventEmitter.emit('layoutTypeKey', LayoutType[value]);
   };
 
   return (

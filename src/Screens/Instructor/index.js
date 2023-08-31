@@ -5,16 +5,15 @@ import { UserData } from '../../utils';
 import UserCard from '../../components/UserCard';
 
 const Instructor = () => {
-  const numColumns = 4;
   const localUser = UserData.find((item) => item === 'Rohan');
   const videoPlayer = UserData.find((item) => item === 'Video Player');
 
   const itemWidth = () => {
-    return (Dimensions.get('window').width - 32) / numColumns;
+    return Dimensions.get('window').width * 0.25;
   };
 
   const itemHeight = () => {
-    return (Dimensions.get('window').height - 82) / numColumns;
+    return Dimensions.get('window').height * 0.25;
   };
 
   return (

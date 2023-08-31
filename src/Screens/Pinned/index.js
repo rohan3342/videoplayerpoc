@@ -1,40 +1,22 @@
-import {
-  View,
-  FlatList,
-  Dimensions,
-  StyleSheet,
-  DeviceEventEmitter,
-} from 'react-native';
+import { View, FlatList, Dimensions, StyleSheet } from 'react-native';
 import React from 'react';
 
 import { UserData } from '../../utils';
 import UserCard from '../../components/UserCard';
 
-const Grid = () => {
-  const numColumns = 3;
+const Pinned = () => {
   const userList = UserData.filter((item) => item !== 'Video Player');
-  const videoPlayer = UserData.find((item) => item === 'Video Player');
 
   const itemWidth = () => {
-    return (Dimensions.get('window').width - 32) * 0.25;
+    return Dimensions.get('window').width * 0.25;
   };
 
   const itemHeight = () => {
-    return (Dimensions.get('window').height - 82) * 0.25;
+    return Dimensions.get('window').height * 0.25;
   };
 
   return (
     <View style={styles.container}>
-      <UserCard
-        name={videoPlayer}
-        itemWidth={'75%'}
-        itemHeight={'100%'}
-        key={`${0}_${videoPlayer}`}
-        containerStyle={{ margin: 0 }}
-        onLayout={({ nativeEvent }) => {
-          DeviceEventEmitter.emit('videoPlayerStyle', nativeEvent.layout);
-        }}
-      />
       <FlatList
         bounces={false}
         data={userList}
@@ -56,14 +38,16 @@ const Grid = () => {
   );
 };
 
-export default Grid;
+export default Pinned;
 
 const styles = StyleSheet.create({
   container: {
-    padding: 4,
-    width: '100%',
-    height: '100%',
-    flexDirection: 'row',
+    top: 0,
+    right: 0,
+    zIndex: 1,
+    position: 'absolute',
+    height: Dimensions.get('window').height,
+    width: Dimensions.get('window').width * 0.25,
   },
   videoPlayerView: {},
   localUserView: {

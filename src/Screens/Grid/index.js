@@ -1,39 +1,71 @@
-import React, { memo, useMemo } from 'react';
-import { FlatList, Dimensions, StyleSheet } from 'react-native';
+import React, { Fragment, memo, useEffect, useMemo, useState } from 'react';
+import {
+  FlatList,
+  Dimensions,
+  StyleSheet,
+  DeviceEventEmitter,
+} from 'react-native';
 
+import Pinned from '../Pinned';
+import Instructor from '../Instructor';
 import UserCard from '../../components/UserCard';
-import { UserData, splitArrayIntoChunks } from '../../utils';
+
+import { UserData, LayoutType, splitArrayIntoChunks } from '../../utils';
 
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
 
 const Grid = ({ ...props }) => {
+  const [defaultView, setDefaultView] = useState('');
+
+  useEffect(() => {
+    DeviceEventEmitter.addListener('layoutTypeKey', (value) => {
+      setDefaultView(value);
+    });
+  }, []);
+
   const listData = useMemo(() => splitArrayIntoChunks(UserData, false));
 
   const renderItem = ({ item, index }) => (
-    <GridLayout list={item} index={index} />
+    <GridLayout list={item} rowIndex={index} />
   );
 
   return (
-    listData.length > 0 && (
-      <FlatList
-        horizontal
-        data={listData}
-        bounces={false}
-        bouncesZoom={false}
-        pagingEnabled={true}
-        initialScrollIndex={0}
-        renderItem={renderItem}
-        decelerationRate={'fast'}
-        style={styles.scrollView}
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scrollViewContentContainerStyle}
-      />
-    )
+    <Fragment>
+      {listData.length > 0 && (
+        <FlatList
+          horizontal
+          data={listData}
+          bounces={false}
+          bouncesZoom={false}
+          pagingEnabled={true}
+          initialScrollIndex={0}
+          renderItem={renderItem}
+          decelerationRate={'fast'}
+          style={styles.scrollView}
+          showsHorizontalScrollIndicator={false}
+          scrollEnabled={
+            defaultView !== LayoutType.INSTRUCTOR &&
+            defaultView !== LayoutType.PINNED
+          }
+          contentContainerStyle={styles.scrollViewContentContainerStyle}
+        />
+      )}
+      {defaultView === LayoutType.PINNED && <Pinned />}
+      {defaultView === LayoutType.INSTRUCTOR && <Instructor />}
+    </Fragment>
   );
 };
 
-const GridLayout = memo(({ list }) => {
+const GridLayout = memo(({ list, rowIndex }) => {
+  const [defaultView, setDefaultView] = useState('');
+
+  useEffect(() => {
+    DeviceEventEmitter.addListener('layoutTypeKey', (value) => {
+      setDefaultView(value);
+    });
+  }, []);
+
   return (
     <FlatList
       data={list}
@@ -43,19 +75,38 @@ const GridLayout = memo(({ list }) => {
       style={styles.grid}
       renderItem={({ item, index }) => {
         console.log('index', index);
+        if (
+          (defaultView === LayoutType.INSTRUCTOR ||
+            defaultView === LayoutType.PINNED) &&
+          !(rowIndex === 0 && index === 0)
+        ) {
+          return;
+        }
         return (
           <UserCard
             name={item}
             index={index}
+            showPlayer={rowIndex === 0 && index === 0}
             containerStyle={{
-              height: HEIGHT * 0.32,
-              width: (WIDTH - 16) * 0.25,
+              height:
+                defaultView === LayoutType.INSTRUCTOR ||
+                defaultView === LayoutType.PINNED
+                  ? HEIGHT
+                  : HEIGHT * 0.32,
+              width:
+                defaultView === LayoutType.INSTRUCTOR
+                  ? WIDTH
+                  : defaultView === LayoutType.PINNED
+                  ? WIDTH * 0.75
+                  : (WIDTH - 16) * 0.25,
             }}
           />
         );
       }}
-      contentContainerStyle={{ alignItems: 'center' }}
       keyExtractor={(item, index) => `${item}_${index}`}
+      contentContainerStyle={{
+        alignItems: defaultView === LayoutType.GRID ? 'center' : 'flex-start',
+      }}
     />
   );
 });
