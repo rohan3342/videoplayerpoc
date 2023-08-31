@@ -1,15 +1,15 @@
-import React, { Fragment, memo, useEffect, useMemo, useState } from 'react';
 import {
   FlatList,
   Dimensions,
   StyleSheet,
   DeviceEventEmitter,
 } from 'react-native';
+import PagerView from 'react-native-pager-view';
+import React, { Fragment, memo, useEffect, useMemo, useState } from 'react';
 
 import Pinned from '../Pinned';
 import Instructor from '../Instructor';
 import UserCard from '../../components/UserCard';
-
 import { UserData, LayoutType, splitArrayIntoChunks } from '../../utils';
 
 const WIDTH = Dimensions.get('window').width;
@@ -26,13 +26,21 @@ const Grid = ({ ...props }) => {
 
   const listData = useMemo(() => splitArrayIntoChunks(UserData, false));
 
-  const renderItem = ({ item, index }) => (
-    <GridLayout list={item} rowIndex={index} />
-  );
-
   return (
     <Fragment>
-      {listData.length > 0 && (
+      <PagerView
+        initialPage={0}
+        style={styles.scrollView}
+        scrollEnabled={
+          defaultView !== LayoutType.PINNED &&
+          defaultView !== LayoutType.INSTRUCTOR
+        }
+      >
+        {listData.map((item, index) => (
+          <GridLayout key={index} list={item} rowIndex={index} />
+        ))}
+      </PagerView>
+      {/* {listData.length > 0 && (
         <FlatList
           horizontal
           data={listData}
@@ -50,7 +58,7 @@ const Grid = ({ ...props }) => {
           }
           contentContainerStyle={styles.scrollViewContentContainerStyle}
         />
-      )}
+      )} */}
       {defaultView === LayoutType.PINNED && <Pinned />}
       {defaultView === LayoutType.INSTRUCTOR && <Instructor />}
     </Fragment>
@@ -114,7 +122,9 @@ const GridLayout = memo(({ list, rowIndex }) => {
 export default memo(Grid);
 
 const styles = StyleSheet.create({
-  scrollView: {},
+  scrollView: {
+    flex: 1,
+  },
   scrollViewContentContainerStyle: {},
   grid: {
     width: WIDTH,
