@@ -1,6 +1,6 @@
 import Video from 'react-native-video';
 import { StyleSheet } from 'react-native';
-import React, { useRef, useState } from 'react';
+import React, { memo, useRef, useState } from 'react';
 
 const VideoPlayer = ({ playUrl, ...props }) => {
   let videoPlayerRef = useRef(null);
@@ -46,7 +46,7 @@ const VideoPlayer = ({ playUrl, ...props }) => {
   ) : null;
 };
 
-export default VideoPlayer;
+export default memo(VideoPlayer);
 
 const styles = StyleSheet.create({
   container: {

@@ -1,9 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
+import VideoPlayer from '../VideoPlayer';
+
 const UserCard = ({
   name,
   itemWidth,
+  showPlayer,
   itemHeight,
   containerStyle,
   onLayout = () => {},
@@ -19,9 +22,15 @@ const UserCard = ({
         containerStyle && containerStyle,
       ]}
     >
-      <View style={styles.subContainer}>
-        <Text style={styles.text}>{name}</Text>
-      </View>
+      {showPlayer ? (
+        <VideoPlayer
+          playUrl={'http://content.jwplatform.com/manifests/vM7nH0Kl.m3u8'}
+        />
+      ) : (
+        <View style={styles.subContainer}>
+          <Text style={styles.text}>{name}</Text>
+        </View>
+      )}
     </View>
   );
 };
