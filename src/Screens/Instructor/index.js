@@ -10,10 +10,6 @@ import React, { useRef } from 'react';
 import { UserData } from '../../utils';
 import UserCard from '../../components/UserCard';
 
-const config = {
-  velocityThreshold: 0.3,
-  directionalOffsetThreshold: 80,
-};
 const item = { height: 100, width: 200 };
 const { width, height } = Dimensions.get('window');
 
@@ -32,12 +28,13 @@ const Instructor = () => {
       onPanResponderMove: Animated.event([null, { dx: pan.x, dy: pan.y }], {
         useNativeDriver: false,
       }),
-      onPanResponderRelease: (e, gestureState) => handleRelease(gestureState),
+      onPanResponderRelease: (e, gestureState) =>
+        onPanResponderRelease(gestureState),
     })
   ).current;
 
-  const handleRelease = (gestureState) => {
-    const { dx, dy, moveX, moveY } = gestureState;
+  const onPanResponderRelease = (gestureState) => {
+    const { moveX, moveY } = gestureState;
 
     const quad_1 = {
       minWidth: 0,
@@ -106,40 +103,6 @@ const Instructor = () => {
           key={`${1}_${localUser}`}
         />
       </Animated.View>
-      {/* <View style={styles.rowContainer}>
-        <View style={styles.row}>
-          <View style={styles.quad1}>
-            <Text>Quad 1</Text>
-            <Text>X: 0 - {height / 2}</Text>
-            <Text>Y: 0 - {width / 2}</Text>
-          </View>
-          <View style={styles.quad2}>
-            <Text>Quad 2</Text>
-            <Text>X: 0 - {height / 2}</Text>
-            <Text>
-              Y: {width / 2} - {width}
-            </Text>
-          </View>
-        </View>
-        <View style={styles.row}>
-          <View style={styles.quad3}>
-            <Text>Quad 3</Text>
-            <Text>
-              X: {height / 2} - {height}
-            </Text>
-            <Text>Y: 0 - {width / 2}</Text>
-          </View>
-          <View style={styles.quad4}>
-            <Text>Quad 4</Text>
-            <Text>
-              X: {height / 2} - {height}
-            </Text>
-            <Text>
-              Y: {width / 2} - {width}
-            </Text>
-          </View>
-        </View>
-      </View> */}
     </View>
   );
 };
@@ -170,59 +133,5 @@ const styles = StyleSheet.create({
     shadowColor: '#171717',
     backgroundColor: '#ccc',
     shadowOffset: { width: 2, height: 2 },
-  },
-  rowContainer: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'white',
-  },
-  row: {
-    width: '100%',
-    height: '50%',
-    flexDirection: 'row',
-  },
-  quad1: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: 'red',
-    borderTopWidth: 120,
-    alignItems: 'center',
-    borderLeftWidth: 240,
-    borderTopColor: 'red',
-    borderLeftColor: 'red',
-    justifyContent: 'center',
-  },
-  quad2: {
-    flex: 1,
-    borderWidth: 1,
-    borderTopWidth: 120,
-    alignItems: 'center',
-    borderRightWidth: 240,
-    borderColor: 'yellow',
-    justifyContent: 'center',
-    borderTopColor: 'yellow',
-    borderRightColor: 'yellow',
-  },
-  quad3: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: 'green',
-    borderLeftWidth: 240,
-    alignItems: 'center',
-    borderBottomWidth: 120,
-    borderLeftColor: 'green',
-    justifyContent: 'center',
-    borderBottomColor: 'green',
-  },
-  quad4: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: 'pink',
-    alignItems: 'center',
-    borderRightWidth: 240,
-    borderBottomWidth: 120,
-    borderRightColor: 'pink',
-    justifyContent: 'center',
-    borderBottomColor: 'pink',
   },
 });
